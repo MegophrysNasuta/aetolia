@@ -1,0 +1,11 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "yes"
+    },
+    "type": "scriptgroup",
+    "name": "gg",
+    "packageName": null,
+    "script": null,
+    "eventHandlerList": null
+}

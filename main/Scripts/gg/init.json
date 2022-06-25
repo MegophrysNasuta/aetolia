@@ -1,0 +1,11 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no"
+    },
+    "type": "script",
+    "name": "init",
+    "packageName": null,
+    "script": null,
+    "eventHandlerList": null
+}

@@ -1,0 +1,14 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "yes",
+        "isTempTimer": "no",
+        "isOffsetTimer": "no"
+    },
+    "type": "timergroup",
+    "name": "gg",
+    "script": null,
+    "command": null,
+    "packageName": null,
+    "time": "00:00:00.000"
+}

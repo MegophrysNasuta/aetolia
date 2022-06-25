@@ -1,0 +1,13 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no"
+    },
+    "type": "key",
+    "name": "example",
+    "packageName": null,
+    "script": null,
+    "command": null,
+    "keyCode": "33554431",
+    "keyModifier": "0"
+}

@@ -1,0 +1,12 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no"
+    },
+    "type": "alias",
+    "name": "test",
+    "script": null,
+    "command": null,
+    "packageName": null,
+    "regex": null
+}

@@ -1,0 +1,12 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "yes"
+    },
+    "type": "aliasgroup",
+    "name": "gg",
+    "script": null,
+    "command": null,
+    "packageName": null,
+    "regex": null
+}

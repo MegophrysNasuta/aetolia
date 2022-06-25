@@ -1,0 +1,17 @@
+<MudletPackage version="1.001"><TriggerPackage /><TimerPackage /><AliasPackage /><ActionPackage /><ScriptPackage><ScriptGroup isActive="yes" isFolder="no"><name>autoloader</name><packageName /><script>local settings = getMudletHomeDir() .. '/settings.xml'
+__settingsReloadTimer__ = nil
+function settingsReloaded(_, path)
+  if path == settings then
+    if __settingsReloadTimer__ then killTimer(__settingsReloadTimer__) end
+    removeFileWatch(settings)
+    __settingsReloadTimer__ = tempTimer(0.25, function()
+      cecho('\n&lt;cyan&gt;SETTINGS RELOADED WITH LATEST CHANGES\n')
+      installPackage(settings)
+      addFileWatch(settings)
+    end)
+  end
+end
+
+cecho('\n&lt;cyan&gt;Watching settings file for changes...\n')
+addFileWatch(settings)
+registerAnonymousEventHandler('sysPathChanged', settingsReloaded)</script><eventHandlerList /></ScriptGroup></ScriptPackage><KeyPackage /><HelpPackage><helpURL /></HelpPackage></MudletPackage>

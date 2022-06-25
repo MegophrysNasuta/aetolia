@@ -1,0 +1,14 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no",
+        "isTempTimer": "no",
+        "isOffsetTimer": "no"
+    },
+    "type": "timer",
+    "name": "example",
+    "script": null,
+    "command": null,
+    "packageName": null,
+    "time": "00:00:00.000"
+}

@@ -1,0 +1,11 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no"
+    },
+    "type": "script",
+    "name": "autoloader",
+    "packageName": null,
+    "script": "local settings = getMudletHomeDir() .. '/settings.xml'\n__settingsReloadTimer__ = nil\nfunction settingsReloaded(_, path)\n  if path == settings then\n    if __settingsReloadTimer__ then killTimer(__settingsReloadTimer__) end\n    removeFileWatch(settings)\n    __settingsReloadTimer__ = tempTimer(0.25, function()\n      cecho('\\n<cyan>SETTINGS RELOADED WITH LATEST CHANGES\\n')\n      installPackage(settings)\n      addFileWatch(settings)\n    end)\n  end\nend\n\ncecho('\\n<cyan>Watching settings file for changes...\\n')\naddFileWatch(settings)\nregisterAnonymousEventHandler('sysPathChanged', settingsReloaded)",
+    "eventHandlerList": null
+}
