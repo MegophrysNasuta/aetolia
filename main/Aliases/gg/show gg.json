@@ -4,9 +4,9 @@
         "isFolder": "no"
     },
     "type": "alias",
-    "name": "test",
-    "script": null,
+    "name": "show gg",
+    "script": "display(gg)",
     "command": null,
     "packageName": null,
-    "regex": null
+    "regex": "^gg$"
 }

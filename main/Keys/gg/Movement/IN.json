@@ -4,10 +4,10 @@
         "isFolder": "no"
     },
     "type": "key",
-    "name": "example",
+    "name": "IN",
     "packageName": null,
     "script": null,
-    "command": null,
-    "keyCode": "33554431",
-    "keyModifier": "0"
+    "command": "in",
+    "keyCode": "47",
+    "keyModifier": "536870912"
 }

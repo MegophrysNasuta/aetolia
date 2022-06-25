@@ -1,0 +1,13 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no"
+    },
+    "type": "key",
+    "name": "LOOK",
+    "packageName": null,
+    "script": null,
+    "command": "look",
+    "keyCode": "53",
+    "keyModifier": "536870912"
+}

@@ -1,0 +1,13 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no"
+    },
+    "type": "key",
+    "name": "NW",
+    "packageName": null,
+    "script": null,
+    "command": "nw",
+    "keyCode": "55",
+    "keyModifier": "536870912"
+}

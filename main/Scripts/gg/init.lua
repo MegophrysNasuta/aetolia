@@ -153,6 +153,7 @@ function gg.processTime()
         [21] = "21st", [22] = "22nd", [23] = "23rd",
         [31] = "31st"
     }
+
     local ordinal = ordinals[time.day] or (time.day .. "th")
 
     local seasons = {
@@ -187,7 +188,7 @@ function gg.setupGMCPEventHandlers()
     local selfDebuffEvents = {"gmcp.Char.Afflictions.List", "gmcp.Char.Afflictions.Add",
                               "gmcp.Char.Afflictions.Remove"}
 
-    for _, event in ipairs(itemsEvents) do
+    for _, event in ipairs(itemEvents) do
         registerAnonymousEventHandler(event, function() gg.processItems("room") end)
     end
 
@@ -208,3 +209,4 @@ function gg.setupGMCPEventHandlers()
 
     registerAnonymousEventHandler("sysGetHttpDone", gg.processWho)
 end
+

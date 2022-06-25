@@ -4,11 +4,10 @@
         "isFolder": "yes"
     },
     "type": "keygroup",
-    "name": "gg",
+    "name": "Movement",
     "packageName": null,
     "script": null,
     "command": null,
     "keyCode": "33554431",
-    "keyModifier": "0",
-    "KeyGroup": "\n\t\t\t\t"
+    "keyModifier": "0"
 }

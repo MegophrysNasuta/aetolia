@@ -13,8 +13,8 @@
         "isColorTriggerBg": "no"
     },
     "type": "trigger",
-    "name": "example",
-    "script": null,
+    "name": "onConnect",
+    "script": "gg.setupGMCPEventHandlers()",
     "triggerType": "0",
     "conditonLineDelta": "0",
     "mStayOpen": "0",
@@ -29,8 +29,8 @@
     "regexCodePropertyList": "\n\t\t\t\t\t",
     "matches": [
         [
-            "test",
-            "0"
+            "Password correct. Welcome to Aetolia.",
+            "3"
         ]
     ]
 }

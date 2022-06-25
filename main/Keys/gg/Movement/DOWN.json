@@ -1,0 +1,13 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no"
+    },
+    "type": "key",
+    "name": "DOWN",
+    "packageName": null,
+    "script": null,
+    "command": "down",
+    "keyCode": "43",
+    "keyModifier": "536870912"
+}

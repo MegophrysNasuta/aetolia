@@ -1,0 +1,13 @@
+{
+    "attribs": {
+        "isActive": "yes",
+        "isFolder": "no"
+    },
+    "type": "key",
+    "name": "OUT",
+    "packageName": null,
+    "script": null,
+    "command": "out",
+    "keyCode": "43",
+    "keyModifier": "536870912"
+}

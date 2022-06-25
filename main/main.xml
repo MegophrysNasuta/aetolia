@@ -1,6 +1,87 @@
-<MudletPackage version="1.001"><TriggerPackage><TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no"><name>gg</name><script /><triggerType>0</triggerType><conditionLineDelta /><mStayOpen>0</mStayOpen><mCommand /><packageName /><mFgColor>#ff0000</mFgColor><mBgColor>#ffff00</mBgColor><mSoundFile /><colorTriggerFgColor>#000000</colorTriggerFgColor><colorTriggerBgColor>#000000</colorTriggerBgColor><regexCodeList /><regexCodePropertyList /><Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no"><name>example</name><script /><triggerType>0</triggerType><conditionLineDelta /><mStayOpen>0</mStayOpen><mCommand /><packageName /><mFgColor>#ff0000</mFgColor><mBgColor>#ffff00</mBgColor><mSoundFile /><colorTriggerFgColor>#000000</colorTriggerFgColor><colorTriggerBgColor>#000000</colorTriggerBgColor><regexCodeList>
-					<string>test</string></regexCodeList><regexCodePropertyList>
-					<integer>0</integer></regexCodePropertyList></Trigger></TriggerGroup></TriggerPackage><TimerPackage><TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no"><name>gg</name><script /><command /><packageName /><time>00:00:00.000</time><Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no"><name>example</name><script /><command /><packageName /><time>00:00:00.000</time></Timer></TimerGroup></TimerPackage><AliasPackage><AliasGroup isActive="yes" isFolder="yes"><name>gg</name><script /><command /><packageName /><regex /><Alias isActive="yes" isFolder="no"><name>test</name><script /><command /><packageName /><regex /></Alias></AliasGroup></AliasPackage><ActionPackage /><ScriptPackage><ScriptGroup isActive="yes" isFolder="yes"><name>gg</name><packageName /><script /><eventHandlerList /><Script isActive="yes" isFolder="no"><name>init</name><packageName /><script>gg = gg or {}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+	<TriggerPackage>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>gg</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>onConnect</name>
+				<script>gg.setupGMCPEventHandlers()</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Password correct. Welcome to Aetolia.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>3</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</TriggerGroup>
+	</TriggerPackage>
+	<TimerPackage>
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+			<name>gg</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:00:00.000</time>
+			<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+				<name>who</name>
+				<script>getHTTP("https://api.aetolia.com/characters.json")</script>
+				<command></command>
+				<packageName></packageName>
+				<time>00:00:01.000</time>
+			</Timer>
+		</TimerGroup>
+	</TimerPackage>
+	<AliasPackage>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>gg</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>show gg</name>
+				<script>display(gg)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^gg$</regex>
+			</Alias>
+		</AliasGroup>
+	</AliasPackage>
+	<ActionPackage />
+	<ScriptPackage>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>gg</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>init</name>
+				<packageName></packageName>
+				<script>gg = gg or {}
 
 gg.self = gg.self or {}
 gg.target = gg.target or {}
@@ -155,6 +236,7 @@ function gg.processTime()
         [21] = "21st", [22] = "22nd", [23] = "23rd",
         [31] = "31st"
     }
+
     local ordinal = ordinals[time.day] or (time.day .. "th")
 
     local seasons = {
@@ -210,4 +292,134 @@ function gg.setupGMCPEventHandlers()
 
     registerAnonymousEventHandler("sysGetHttpDone", gg.processWho)
 end
-</script><eventHandlerList /></Script></ScriptGroup></ScriptPackage><KeyPackage><KeyGroup isActive="yes" isFolder="yes"><name>gg</name><script /><command /><packageName /><keyCode>33554431</keyCode><keyModifier>0</keyModifier><Key isActive="yes" isFolder="no"><name>example</name><script /><command /><packageName /><keyCode>33554431</keyCode><keyModifier>0</keyModifier></Key></KeyGroup></KeyPackage><HelpPackage><helpURL /></HelpPackage></MudletPackage>
+</script>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
+	</ScriptPackage>
+	<KeyPackage>
+		<KeyGroup isActive="yes" isFolder="yes">
+			<name>gg</name>
+			<packageName></packageName>
+			<script></script>
+			<command></command>
+			<keyCode>33554431</keyCode>
+			<keyModifier>0</keyModifier>
+			<KeyGroup isActive="yes" isFolder="yes">
+				<name>Movement</name>
+				<packageName></packageName>
+				<script></script>
+				<command></command>
+				<keyCode>33554431</keyCode>
+				<keyModifier>0</keyModifier>
+				<Key isActive="yes" isFolder="no">
+					<name>LOOK</name>
+					<packageName></packageName>
+					<script></script>
+					<command>look</command>
+					<keyCode>53</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>N</name>
+					<packageName></packageName>
+					<script></script>
+					<command>n</command>
+					<keyCode>56</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>NE</name>
+					<packageName></packageName>
+					<script></script>
+					<command>ne</command>
+					<keyCode>57</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>E</name>
+					<packageName></packageName>
+					<script></script>
+					<command>e</command>
+					<keyCode>54</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>SE</name>
+					<packageName></packageName>
+					<script></script>
+					<command>se</command>
+					<keyCode>51</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>S</name>
+					<packageName></packageName>
+					<script></script>
+					<command>s</command>
+					<keyCode>50</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>SW</name>
+					<packageName></packageName>
+					<script></script>
+					<command>sw</command>
+					<keyCode>49</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>W</name>
+					<packageName></packageName>
+					<script></script>
+					<command>w</command>
+					<keyCode>52</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>NW</name>
+					<packageName></packageName>
+					<script></script>
+					<command>nw</command>
+					<keyCode>55</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>IN</name>
+					<packageName></packageName>
+					<script></script>
+					<command>in</command>
+					<keyCode>47</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>OUT</name>
+					<packageName></packageName>
+					<script></script>
+					<command>out</command>
+					<keyCode>43</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>UP</name>
+					<packageName></packageName>
+					<script></script>
+					<command>up</command>
+					<keyCode>45</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+				<Key isActive="yes" isFolder="no">
+					<name>DOWN</name>
+					<packageName></packageName>
+					<script></script>
+					<command>down</command>
+					<keyCode>43</keyCode>
+					<keyModifier>536870912</keyModifier>
+				</Key>
+			</KeyGroup>
+		</KeyGroup>
+	</KeyPackage>
+	<VariablePackage>
+		<HiddenVariables />
+	</VariablePackage>
+</MudletPackage>
