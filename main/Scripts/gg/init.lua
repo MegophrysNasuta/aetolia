@@ -83,13 +83,13 @@ function gg.processItems(type_filter)
         end
     end
 
-    if Items.Add.location == type_filter and needToAdd then
+    if Items.Add and Items.Add.location == type_filter and needToAdd then
         local item = Items.Add.item
         local this_type_attribs = itemAttribMap[item.attrib or "u"]
         contents[this_type_attribs][#contents[this_type_attribs] + 1] = item
     end
 
-    if Items.Remove.location == type_filter then
+    if Items.Remove and Items.Remove.location == type_filter then
         local remove_item = Items.Remove.item
         for attrib_type, subtable in pairs(contents) do
             for index, item in ipairs(subtable) do
@@ -101,7 +101,7 @@ function gg.processItems(type_filter)
         end
     end
 
-    if Items.Update.location == type_filter then
+    if Items.Update and Items.Update.location == type_filter then
         local update_item = Items.Update.item
         local subtable = contents[itemAttribMap[update_item.attrib or "u"]]
         for index, item in ipairs(subtable) do
@@ -124,7 +124,7 @@ function gg.processNearbyAdventurers()
         players[#players + 1] = player.name
     end
 
-    if not table.contains(players, Room.AddPlayer.name) then
+    if Room.AddPlayer and not table.contains(players, Room.AddPlayer.name) then
         players[#players + 1] = Room.AddPlayer.name
     end
 
@@ -156,6 +156,10 @@ function gg.processTime()
 
     local ordinal = ordinals[time.day] or (time.day .. "th")
 
+    local months = {"Variach", "Severin", "Ios", "Arios", "Chakros", "Khepary",
+                    "Midsummer", "Lleian", "Lanosian", "Niuran", "Slyphian", "Haernos"}
+    local month = months[time.month]
+
     local seasons = {
         "mid-winter", "late winter", "early spring",
         "mid-spring", "late spring", "early summer",
@@ -163,7 +167,7 @@ function gg.processTime()
         "mid-autumn", "late autumn", "early winter",
     }
 
-    time.string = (ordinal .." ".. time.month ..", ".. time.year ..
+    time.string = (ordinal .." ".. month ..", ".. time.year ..
                    " (".. seasons[tonumber(time.mon)] ..", ".. time.moonphase ..
                    ")<br>" .. time.time)
     gg.time = time
@@ -205,7 +209,7 @@ function gg.setupGMCPEventHandlers()
     end
 
     sendGMCP([[Core.Supports.Add ["IRE.Time 1"] ]])
-    registerAnonymousEventHandler("gmcp.IRE.Time.Update", gg.ProcessTime)
+    registerAnonymousEventHandler("gmcp.IRE.Time.Update", gg.processTime)
 
     registerAnonymousEventHandler("sysGetHttpDone", gg.processWho)
 end
