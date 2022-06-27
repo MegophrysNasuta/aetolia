@@ -1,8 +1,12 @@
+enableTrigger("gg.autonews")
+enableTrigger("gg.automore")
 gg = gg or {}
 gg.ui = gg.ui or {}
 gg.ui.refreshInterval = .1
 gg.ui.availColor = "cyan"
 gg.ui.infoColor = "white"
+gg.ui.keepColor = "SpringGreen"
+gg.ui.loseColor = "OrangeRed"
 gg.ui.offColor = "grey"
 gg.ui.roomColor = "DarkOrange"
 gg.ui.timeColor = "LightSkyBlue"
@@ -18,6 +22,7 @@ gg.who = gg.who or {}
 gg.self.buffs = gg.self.buffs or {}
 gg.self.debuffs = gg.self.debuffs or {}
 gg.self.inv = gg.self.inv or {}
+gg.self.keepup = gg.self.keepup or {}
 gg.self.room = gg.self.room or {}
 gg.self.room.contents = gg.self.room.contents or {}
 gg.self.room.players = gg.self.room.players or {}
@@ -31,7 +36,7 @@ gg.target.debuffs = gg.target.debuffs or {}
 local itemAttribMap = {
     w = "worn items", W = "wearable items", l = "wielded",
     g = "groupable", c = "containers", t = "takeables",
-    m = "mobs", d = "corpses", x = "friendlies", u = "unknown items"
+    m = "mobs", d = "corpses", mx = "friendlies", u = "unknown items"
 }
 
 
@@ -288,7 +293,7 @@ function gg.drawUIRightPanel()
         gg.ui.goldBadge = Geyser.Label:new({
             name="gg.ui.goldBadge", x="50%", y=36, width="50%", height=18, fontSize=10,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-        gg.ui.goldBadge:setClickCallback(function() send("currency report") end)
+        gg.ui.goldBadge:setClickCallback(function() sendAll("currency report", "credit report") end)
     end
     gg.ui.goldBadge:echo("<center>Gold: " .. Status.gold .." - Banked: ".. Status.bank .."</center>")
 
@@ -345,9 +350,7 @@ function gg.drawUIRightPanel()
         for _, player in ipairs(gg.self.room.players) do
             cechoLink("gg.ui.roomContentsWindow", player.name,
                       function()
-                        send("honours ".. player.name)
-                        cechoLink("<red>[ClickToTarget] ".. player.name,
-                                  function() send("st ".. player.name) end, "", true)
+                        sendAll("look at ".. player.name, "st ".. player.name)
                       end, "", true)
             if _ ~= #gg.self.room.players then
                 gg.ui.roomContentsWindow:cecho(", ")
@@ -360,13 +363,22 @@ function gg.drawUIRightPanel()
             for _, obj in ipairs(objs) do
                 cechoLink("gg.ui.roomContentsWindow", obj.name,
                           function()
-                            send("p ".. obj.id)
-                            cechoLink("<red>[ClickToTarget] ".. obj.name,
-                                      function() send("st ".. obj.id) end, "", true)
+                            sendAll("p ".. obj.id, "st ".. obj.id)
                           end, "", true)
                 if _ ~= #objs then
                     gg.ui.roomContentsWindow:cecho(", ")
                 end
+            end
+        end
+    end
+
+    if gg.who then
+        gg.ui.roomContentsWindow:cecho("\n\nWho: ")
+        for _, player in ipairs(gg.who) do
+            cechoLink("gg.ui.roomContentsWindow", player,
+                      function() send("honours ".. player) end, "", true)
+            if _ ~= #gg.who then
+                gg.ui.roomContentsWindow:cecho(", ")
             end
         end
     end
@@ -434,6 +446,43 @@ function gg.event(event, message, eventColor)
     if eventColor then log_message = log_message .."<".. eventColor ..">" end
     log_message = log_message .. event .. "<white>] ".. (message or "BLANK") .."\n"
     cecho(log_message)
+end
+
+
+function gg.keepDef(def, command)
+    for _, defInfo in ipairs(gg.self.keepup) do
+        if defInfo.name == def then return end
+    end
+
+    gg.self.keepup[#gg.self.keepup + 1] = {name=def, command=command}
+    gg.event("Keepup+", def, gg.ui.keepColor)
+end
+
+
+function gg.loseDef(def, command)
+    for index, defInfo in ipairs(gg.self.keepup) do
+        if defInfo.name == def then
+            table.remove(gg.self.keepup, index)
+            break
+        end
+    end
+
+    gg.event("Keepup-", def, gg.ui.loseColor)
+    if command then send(command) end
+end
+
+
+function gg.onPrompt()
+    for _, def in ipairs(gg.self.keepup) do
+        local defIsUp = false
+        for _, currentDef in ipairs(gg.self.buffs) do
+            if currentDef.name == def.name then
+                defIsUp = true
+                break
+            end
+        end
+        if not defIsUp then send(def.command) end
+    end
 end
 
 
@@ -685,27 +734,27 @@ function gg.setupGMCPEventHandlers()
 
     deleteNamedEventHandler("gg.event", "gmcp.Room.AddPlayer")
     registerNamedEventHandler("gg.event", "gmcp.Room.AddPlayer", "gmcp.Room.AddPlayer",
-        function() gg.event("Player entered", gmcp.Room.AddPlayer.name, "gold") end)
+        function() gg.event("Player entered", gmcp.Room.AddPlayer.name, gg.ui.keepColor) end)
 
     deleteNamedEventHandler("gg.event", "gmcp.Room.RemovePlayer")
     registerNamedEventHandler("gg.event", "gmcp.Room.RemovePlayer", "gmcp.Room.RemovePlayer",
-        function() gg.event("Player left", gmcp.Room.RemovePlayer, "gold") end)
+        function() gg.event("Player left", gmcp.Room.RemovePlayer, gg.ui.loseColor) end)
 
     deleteNamedEventHandler("gg.event", "gmcp.Char.Defences.Add")
     registerNamedEventHandler("gg.event", "gmcp.Char.Defences.Add", "gmcp.Char.Defences.Add",
-        function() gg.event("Def+", gmcp.Char.Defences.Add.name, "SpringGreen") end)
+        function() gg.event("Def+", gmcp.Char.Defences.Add.name, gg.ui.keepColor) end)
 
     deleteNamedEventHandler("gg.event", "gmcp.Char.Defences.Remove")
     registerNamedEventHandler("gg.event", "gmcp.Char.Defences.Remove", "gmcp.Char.Defences.Remove",
-        function() gg.event("Def-", gmcp.Char.Defences.Remove[1], "OrangeRed") end)
+        function() gg.event("Def-", gmcp.Char.Defences.Remove[1], gg.ui.loseColor) end)
 
     deleteNamedEventHandler("gg.event", "gmcp.Char.Afflictions.Add")
     registerNamedEventHandler("gg.event", "gmcp.Char.Afflictions.Add", "gmcp.Char.Afflictions.Add",
-        function() gg.event("Aff+", gmcp.Char.Afflictions.Add.name, "OrangeRed") end)
+        function() gg.event("Aff+", gmcp.Char.Afflictions.Add.name, gg.ui.loseColor) end)
 
     deleteNamedEventHandler("gg.event", "gmcp.Char.Afflictions.Remove")
     registerNamedEventHandler("gg.event", "gmcp.Char.Afflictions.Remove", "gmcp.Char.Afflictions.Remove",
-        function() gg.event("Aff-", gmcp.Char.Afflictions.Remove[1], "SpringGreen") end)
+        function() gg.event("Aff-", gmcp.Char.Afflictions.Remove[1], gg.ui.keepColor) end)
 end
 
 
