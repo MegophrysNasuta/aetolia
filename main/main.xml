@@ -1,8 +1,91 @@
-function gg.event(event, message, eventColor)
+<MudletPackage version="1.001"><TriggerPackage><TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no"><name>gg</name><script /><triggerType>0</triggerType><conditionLineDelta /><mStayOpen>0</mStayOpen><mCommand /><packageName /><mFgColor>#ff0000</mFgColor><mBgColor>#ffff00</mBgColor><mSoundFile /><colorTriggerFgColor>#000000</colorTriggerFgColor><colorTriggerBgColor>#000000</colorTriggerBgColor><regexCodeList /><regexCodePropertyList /></TriggerGroup></TriggerPackage><TimerPackage><TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no"><name>gg</name><script /><command /><packageName /><time>00:00:00.000</time><Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no"><name>who|time</name><script>getHTTP("https://api.aetolia.com/characters.json")
+sendGMCP([[IRE.Time.Request]])
+</script><command /><packageName /><time>00:00:01.000</time></Timer></TimerGroup></TimerPackage><AliasPackage><AliasGroup isActive="yes" isFolder="yes"><name>gg</name><script /><command /><packageName /><regex /><Alias isActive="yes" isFolder="no"><name>show gmcp</name><script>display(gmcp)
+</script><command /><packageName /><regex>^gmcp$</regex></Alias><Alias isActive="yes" isFolder="no"><name>show colors</name><script>showColors()
+</script><command /><packageName /><regex>^colors$</regex></Alias><Alias isActive="yes" isFolder="no"><name>show gg</name><script>local ui = gg.ui
+gg.ui = {}
+display(gg)
+gg.ui = ui
+</script><command /><packageName /><regex>^gg$</regex></Alias></AliasGroup></AliasPackage><ActionPackage /><ScriptPackage><ScriptGroup isActive="yes" isFolder="yes"><name>gg</name><packageName /><script /><eventHandlerList /><Script isActive="yes" isFolder="no"><name>init</name><packageName /><script>gg = gg or {}
+gg.ui = gg.ui or {}
+gg.ui.refreshInterval = .1
+gg.ui.availColor = "cyan"
+gg.ui.infoColor = "white"
+gg.ui.offColor = "grey"
+gg.ui.roomColor = "DarkOrange"
+
+gg.self = gg.self or {}
+gg.target = gg.target or {}
+gg.time = gg.time or {}
+gg.who = gg.who or {}
+
+gg.self.buffs = gg.self.buffs or {}
+gg.self.debuffs = gg.self.debuffs or {}
+gg.self.inv = gg.self.inv or {}
+gg.self.room = gg.self.room or {}
+gg.self.room.contents = gg.self.room.contents or {}
+gg.self.room.players = gg.self.room.players or {}
+gg.self.skills = gg.self.skills or {}
+gg.self.vitals = gg.self.vitals or {}
+
+gg.target.buffs = gg.target.buffs or {}
+gg.target.debuffs = gg.target.debuffs or {}
+
+local self = gg.self
+local target = gg.target
+
+local room = self.room
+
+local itemAttribMap = {
+    w = "worn items", W = "wearable items", l = "wielded",
+    g = "groupable", c = "containers", t = "takeables",
+    m = "mobs", d = "corpses", x = "friendlies", u = "unknown items"
+}
+
+self.bleeding = function() return Vitals.bleeding ~= "0" end
+self.blind = function() return Vitals.blind == "1" end
+self.can_eat = function() return Vitals.herb == "1" end
+self.can_focus = function() return Vitals.focus == "1" end
+self.can_moss = function() return Vitals.moss == "1" end
+self.can_renew = function() return Vitals.renew == "1" end
+self.can_salve = function() return Vitals.salve == "1" end
+self.can_sip = function() return Vitals.elixir == "1" end
+self.can_smoke = function() return Vitals.pipe == "1" end
+self.can_tree = function() return Vitals.tree == "1" end
+self.cloaked = function() return Vitals.cloak == "1" end
+self.deaf = function() return Vitals.deaf == "1" end
+self.fallen = function() return Vitals.fallen ~= "0" end
+self.fangbarrier = function() return Vitals.fangbarrier ~= "0" end
+self.has_ability_balance = function() return Vitals.ability_bal == "1" end
+self.has_balance = function() return Vitals.balance == "1" end
+self.has_equilibrium = function() return Vitals.equilibrium == "1" end
+self.has_left_arm = function() return Vitals.left_arm == "1" end
+self.has_right_arm = function() return Vitals.right_arm == "1" end
+self.mad = function() return Vitals.madness == "1" end
+self.mounted = function() return Vitals.mounted == "1" end
+self.phased = function() return Vitals.phased == "1" end
+self.prone = function() return Vitals.prone == "1" end
+self.writhing = function() return Vitals.writhing == "1" end
+
+self.build = function() return Status.spec .." ".. Status.race .." ".. Status.class end
+self.gold = function() return {banked = tonumber(Status.bank), held = tonumber(Status.gold)} end
+self.stats = {
+    hp = function() return (tonumber(Vitals.hp) / tonumber(Vitals.maxhp)) * 100 end,
+    mp = function() return (tonumber(Vitals.mp) / tonumber(Vitals.maxmp)) * 100 end,
+    ep = function() return (tonumber(Vitals.ep) / tonumber(Vitals.maxep)) * 100 end,
+    wp = function() return (tonumber(Vitals.wp) / tonumber(Vitals.maxwp)) * 100 end,
+    blood = function() return tonumber(Vitals.blood) end,
+    to_next_level = function() return tonumber(Vitals.nl) end
+}
+self.wielding = {
+    left = function() return Vitals.wield_left end,
+    right = function() return Vitals.wield_right end
+}
+</script><eventHandlerList /></Script><Script isActive="yes" isFolder="no"><name>funcs</name><packageName /><script>function gg.event(event, message, eventColor)
     raiseEvent(event, message)
-    local log_message = "\n<white>["
-    if eventColor then log_message = log_message .."<".. eventColor ..">" end
-    log_message = log_message .. event .. "<white>] ".. (message or "BLANK") .."\n"
+    local log_message = "\n&lt;white&gt;["
+    if eventColor then log_message = log_message .."&lt;".. eventColor .."&gt;" end
+    log_message = log_message .. event .. "&lt;white&gt;] ".. (message or "BLANK") .."\n"
     cecho(log_message)
 end
 
@@ -217,56 +300,56 @@ function gg.drawUI()
     gg.ui.eatBadge = Geyser.Label:new({
         name="gg.ui.eatBadge", x=0, y=0, width="7.5%", height=33, fontSize=10,
         fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
-    gg.ui.eatBadge:echo("<center>EAT</center>")
+    gg.ui.eatBadge:echo("&lt;center&gt;EAT&lt;/center&gt;")
     gg.ui.eatBadge:setClickCallback(function() send("") end)
 
     if self.can_focus() then color = gg.ui.availColor else color = gg.ui.offColor end
     gg.ui.focusBadge = Geyser.Label:new({
         name="gg.ui.focusBadge", x="7.5%", y=0, width="7.5%", height=33, fontSize=10,
         fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
-    gg.ui.focusBadge:echo("<center>FOCUS</center>")
+    gg.ui.focusBadge:echo("&lt;center&gt;FOCUS&lt;/center&gt;")
     gg.ui.focusBadge:setClickCallback(function() send("focus") end)
 
     if self.can_moss() then color = gg.ui.availColor else color = gg.ui.offColor end
     gg.ui.mossBadge = Geyser.Label:new({
         name="gg.ui.mossBadge", x="15%", y=0, width="7.5%", height=33, fontSize=10,
         fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
-    gg.ui.mossBadge:echo("<center>MOSS</center>")
+    gg.ui.mossBadge:echo("&lt;center&gt;MOSS&lt;/center&gt;")
     gg.ui.mossBadge:setClickCallback(function() send("touch moss") end)
 
     if self.can_renew() then color = gg.ui.availColor else color = gg.ui.offColor end
     gg.ui.renewBadge = Geyser.Label:new({
         name="gg.ui.renewBadge", x="22.5%", y=0, width="7.5%", height=33, fontSize=10,
         fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
-    gg.ui.renewBadge:echo("<center>RENEW</center>")
+    gg.ui.renewBadge:echo("&lt;center&gt;RENEW&lt;/center&gt;")
     gg.ui.renewBadge:setClickCallback(function() send("renew") end)
 
     if self.can_salve() then color = gg.ui.availColor else color = gg.ui.offColor end
     gg.ui.salveBadge = Geyser.Label:new({
         name="gg.ui.salveBadge", x="30%", y=0, width="7.5%", height=33, fontSize=10,
         fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
-    gg.ui.salveBadge:echo("<center>SALVE</center>")
+    gg.ui.salveBadge:echo("&lt;center&gt;SALVE&lt;/center&gt;")
     gg.ui.salveBadge:setClickCallback(function() send("") end)
 
     if self.can_sip() then color = gg.ui.availColor else color = gg.ui.offColor end
     gg.ui.sipBadge = Geyser.Label:new({
         name="gg.ui.sipBadge", x="37.5%", y=0, width="7.5%", height=33, fontSize=10,
         fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
-    gg.ui.sipBadge:echo("<center>SIP</center>")
+    gg.ui.sipBadge:echo("&lt;center&gt;SIP&lt;/center&gt;")
     gg.ui.sipBadge:setClickCallback(function() send("") end)
 
     if self.can_smoke() then color = gg.ui.availColor else color = gg.ui.offColor end
     gg.ui.smokeBadge = Geyser.Label:new({
         name="gg.ui.smokeBadge", x="45%", y=0, width="7.5%", height=33, fontSize=10,
         fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
-    gg.ui.smokeBadge:echo("<center>SMOKE</center>")
+    gg.ui.smokeBadge:echo("&lt;center&gt;SMOKE&lt;/center&gt;")
     gg.ui.smokeBadge:setClickCallback(function() send("") end)
 
     if self.can_tree() then color = gg.ui.availColor else color = gg.ui.offColor end
     gg.ui.treeBadge = Geyser.Label:new({
         name="gg.ui.treeBadge", x="52.5%", y=0, width="7.5%", height=33, fontSize=10,
         fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
-    gg.ui.treeBadge:echo("<center>TREE</center>")
+    gg.ui.treeBadge:echo("&lt;center&gt;TREE&lt;/center&gt;")
     gg.ui.treeBadge:setClickCallback(function() send("touch tree") end)
 
     -- row 2
@@ -274,7 +357,7 @@ function gg.drawUI()
         name="gg.ui.hpBar", x=0, y=33, width="32%", height=33,
         fontSize=10}, gg.ui.bottomPanel)
     gg.ui.hpBar:setValue(tonumber(Vitals.hp), tonumber(Vitals.maxhp),
-                         "<center>HP: ".. gg.round(self.stats.hp(), 2) .."%</center>")
+                         "&lt;center&gt;HP: ".. gg.round(self.stats.hp(), 2) .."%&lt;/center&gt;")
     gg.ui.hpBar.front:setStyleSheet("background-color: green;")
     gg.ui.hpBar.back:setStyleSheet("background-color: black;")
 
@@ -282,7 +365,7 @@ function gg.drawUI()
         name="gg.ui.mpBar", x="33%", y=33, width="32%", height=33,
         fontSize=10}, gg.ui.bottomPanel)
     gg.ui.mpBar:setValue(tonumber(Vitals.mp), tonumber(Vitals.maxmp),
-                         "<center>MP: ".. gg.round(self.stats.mp(), 2) .."%</center>")
+                         "&lt;center&gt;MP: ".. gg.round(self.stats.mp(), 2) .."%&lt;/center&gt;")
     gg.ui.mpBar.front:setStyleSheet("background-color: navy;")
     gg.ui.mpBar.back:setStyleSheet("background-color: black;")
 
@@ -290,7 +373,7 @@ function gg.drawUI()
         name="gg.ui.bloodBar", x="66%", y=33, width="32%", height=33,
         fontSize=10}, gg.ui.bottomPanel)
     gg.ui.bloodBar:setValue(tonumber(Vitals.blood), 100,
-                            "<center>Blood: ".. Vitals.blood .."%</center>")
+                            "&lt;center&gt;Blood: ".. Vitals.blood .."%&lt;/center&gt;")
     gg.ui.bloodBar.front:setStyleSheet("background-color: maroon;")
     gg.ui.bloodBar.back:setStyleSheet("background-color: black;")
 
@@ -299,7 +382,7 @@ function gg.drawUI()
         name="gg.ui.epBar", x=0, y=66, width="32%", height=33,
         fontSize=10}, gg.ui.bottomPanel)
     gg.ui.epBar:setValue(tonumber(Vitals.ep), tonumber(Vitals.maxep),
-                         "<center>EP: ".. gg.round(self.stats.ep(), 2) .."%</center>")
+                         "&lt;center&gt;EP: ".. gg.round(self.stats.ep(), 2) .."%&lt;/center&gt;")
     gg.ui.epBar.front:setStyleSheet("background-color: goldenrod;")
     gg.ui.epBar.back:setStyleSheet("background-color: black;")
 
@@ -307,7 +390,7 @@ function gg.drawUI()
         name="gg.ui.wpBar", x="33%", y=66, width="32%", height=33,
         fontSize=10}, gg.ui.bottomPanel)
     gg.ui.wpBar:setValue(tonumber(Vitals.wp), tonumber(Vitals.maxwp),
-                         "<center>WP: ".. gg.round(self.stats.wp(), 2) .."%</center>")
+                         "&lt;center&gt;WP: ".. gg.round(self.stats.wp(), 2) .."%&lt;/center&gt;")
     gg.ui.wpBar.front:setStyleSheet("background-color: purple;")
     gg.ui.wpBar.back:setStyleSheet("background-color: black;")
 
@@ -315,7 +398,7 @@ function gg.drawUI()
         name="gg.ui.soulBar", x="66%", y=66, width="32%", height=33,
         fontSize=10}, gg.ui.bottomPanel)
     gg.ui.soulBar:setValue(tonumber(Vitals.soul), 100,
-                            "<center>Soul: ".. Vitals.soul .."%</center>")
+                            "&lt;center&gt;Soul: ".. Vitals.soul .."%&lt;/center&gt;")
     gg.ui.soulBar.front:setStyleSheet("background-color: dodgerblue;")
     gg.ui.soulBar.back:setStyleSheet("background-color: black;")
 
@@ -324,47 +407,47 @@ function gg.drawUI()
     gg.ui.nameBadge = Geyser.Label:new({
         name="gg.ui.nameBadge", x=0, y=0, width="60%", height=18, fontSize=10,
         fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-    gg.ui.nameBadge:echo("<center>".. Status.fullname .."</center>")
+    gg.ui.nameBadge:echo("&lt;center&gt;".. Status.fullname .."&lt;/center&gt;")
     gg.ui.nameBadge:setClickCallback(function() send("honours ".. Status.name ) end)
 
     gg.ui.cityBadge = Geyser.Label:new({
         name="gg.ui.cityBadge", x="60%", y=0, width="40%", height=18, fontSize=10,
         fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-    gg.ui.cityBadge:echo("<center>".. Status.city .."</center>")
+    gg.ui.cityBadge:echo("&lt;center&gt;".. Status.city .."&lt;/center&gt;")
     gg.ui.cityBadge:setClickCallback(function() send("help ".. Status.city ) end)
 
     -- row 2
     gg.ui.specBadge = Geyser.Label:new({
         name="gg.ui.specBadge", x=0, y=18, width="50%", height=18, fontSize=10,
         fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-    gg.ui.specBadge:echo(("<center>".. Status.gender:title() .." ".. Status.spec ..
-                          " ".. Status.race .." ".. Status.class .."</center>"))
+    gg.ui.specBadge:echo(("&lt;center&gt;".. Status.gender:title() .." ".. Status.spec ..
+                          " ".. Status.race .." ".. Status.class .."&lt;/center&gt;"))
     gg.ui.specBadge:setClickCallback(function() send("honours ".. Status.name) end)
 
     gg.ui.houseBadge = Geyser.Label:new({
         name="gg.ui.houseBadge", x="50%", y=18, width="50%", height=18, fontSize=10,
         fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-    gg.ui.houseBadge:echo(("<center> Guild: ".. Status.guild .." Order: "..
-                           Status.order .."</center>"))
+    gg.ui.houseBadge:echo(("&lt;center&gt; Guild: ".. Status.guild .." Order: "..
+                           Status.order .."&lt;/center&gt;"))
     gg.ui.houseBadge:setClickCallback(function() send("honours ".. Status.name) end)
 
     -- row 3
     gg.ui.newsBadge = Geyser.Label:new({
         name="gg.ui.newsBadge", x=0, y=36, width="25%", height=18, fontSize=10,
         fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-    gg.ui.newsBadge:echo("<center>Unread news: ".. Status.unread_news .."</center>")
+    gg.ui.newsBadge:echo("&lt;center&gt;Unread news: ".. Status.unread_news .."&lt;/center&gt;")
     gg.ui.newsBadge:setClickCallback(function() send("nstat") end)
 
     gg.ui.msgsBadge = Geyser.Label:new({
         name="gg.ui.msgsBadge", x="25%", y=36, width="25%", height=18, fontSize=10,
         fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-    gg.ui.msgsBadge:echo("<center>Unread msgs: ".. Status.unread_msgs .."</center>")
+    gg.ui.msgsBadge:echo("&lt;center&gt;Unread msgs: ".. Status.unread_msgs .."&lt;/center&gt;")
     gg.ui.msgsBadge:setClickCallback(function() send("rmsg") end)
 
     gg.ui.goldBadge = Geyser.Label:new({
         name="gg.ui.goldBadge", x="50%", y=36, width="50%", height=18, fontSize=10,
         fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-    gg.ui.goldBadge:echo("<center>Gold: " .. Status.gold .." - Banked: ".. Status.bank .."</center>")
+    gg.ui.goldBadge:echo("&lt;center&gt;Gold: " .. Status.gold .." - Banked: ".. Status.bank .."&lt;/center&gt;")
     gg.ui.goldBadge:setClickCallback(function() send("currency report") end)
 
     -- row 4
@@ -373,10 +456,10 @@ function gg.drawUI()
     gg.ui.roomBadge = Geyser.Label:new({
         name="gg.ui.roomBadge", x=0, y=54, width="100%", height=18, fontSize=10,
         fgColor=gg.ui.roomColor}, gg.ui.rightPanel)
-    gg.ui.roomBadge:cecho(("<center><".. gg.ui.roomColor ..">".. RoomInfo.name .." ("..
-                           RoomInfo.environment ..", ".. RoomInfo.area .."; exits: <"..
-                           gg.ui.infoColor ..">"..tostring(#exits) .."<".. gg.ui.roomColor ..
-                           ">)</center>"))
+    gg.ui.roomBadge:cecho(("&lt;center&gt;&lt;".. gg.ui.roomColor .."&gt;".. RoomInfo.name .." ("..
+                           RoomInfo.environment ..", ".. RoomInfo.area .."; exits: &lt;"..
+                           gg.ui.infoColor .."&gt;"..tostring(#exits) .."&lt;".. gg.ui.roomColor ..
+                           "&gt;)&lt;/center&gt;"))
     gg.ui.roomBadge:setClickCallback(function() send("look") end)
 
     -- map
@@ -458,3 +541,4 @@ function gg.setupGMCPEventHandlers()
 
     gg.refreshUI()
 end
+</script><eventHandlerList /></Script></ScriptGroup></ScriptPackage><KeyPackage><KeyGroup isActive="yes" isFolder="yes"><name>gg</name><script /><command /><packageName /><keyCode>33554431</keyCode><keyModifier>0</keyModifier><KeyGroup isActive="yes" isFolder="yes"><name>Movement</name><script /><command /><packageName /><keyCode>33554431</keyCode><keyModifier>0</keyModifier><Key isActive="yes" isFolder="no"><name>SW</name><script /><command>sw</command><packageName /><keyCode>49</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>NW</name><script /><command>nw</command><packageName /><keyCode>55</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>LOOK</name><script /><command>look</command><packageName /><keyCode>53</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>S</name><script /><command>s</command><packageName /><keyCode>50</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>UP</name><script /><command>up</command><packageName /><keyCode>45</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>NE</name><script /><command>ne</command><packageName /><keyCode>57</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>SE</name><script /><command>se</command><packageName /><keyCode>51</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>E</name><script /><command>e</command><packageName /><keyCode>54</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>N</name><script /><command>n</command><packageName /><keyCode>56</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>W</name><script /><command>w</command><packageName /><keyCode>52</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>IN</name><script /><command>in</command><packageName /><keyCode>47</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>OUT</name><script /><command>out</command><packageName /><keyCode>43</keyCode><keyModifier>536870912</keyModifier></Key><Key isActive="yes" isFolder="no"><name>DOWN</name><script /><command>down</command><packageName /><keyCode>43</keyCode><keyModifier>536870912</keyModifier></Key></KeyGroup></KeyGroup></KeyPackage><HelpPackage><helpURL /></HelpPackage></MudletPackage>
