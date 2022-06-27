@@ -4,9 +4,9 @@
         "isFolder": "no"
     },
     "type": "alias",
-    "name": "show gg",
-    "script": "local ui = gg.ui\ngg.ui = {}\ndisplay(gg)\ngg.ui = ui",
+    "name": "show colors",
+    "script": "showColors()",
     "command": null,
     "packageName": null,
-    "regex": "^gg$"
+    "regex": "^colors$"
 }

@@ -1,4 +1,10 @@
 gg = gg or {}
+gg.ui = gg.ui or {}
+gg.ui.refreshInterval = .1
+gg.ui.availColor = "cyan"
+gg.ui.infoColor = "white"
+gg.ui.offColor = "grey"
+gg.ui.roomColor = "DarkOrange"
 
 gg.self = gg.self or {}
 gg.target = gg.target or {}
@@ -28,189 +34,42 @@ local itemAttribMap = {
     m = "mobs", d = "corpses", x = "friendlies", u = "unknown items"
 }
 
+self.bleeding = function() return Vitals.bleeding ~= "0" end
+self.blind = function() return Vitals.blind == "1" end
+self.can_eat = function() return Vitals.herb == "1" end
+self.can_focus = function() return Vitals.focus == "1" end
+self.can_moss = function() return Vitals.moss == "1" end
+self.can_renew = function() return Vitals.renew == "1" end
+self.can_salve = function() return Vitals.salve == "1" end
+self.can_sip = function() return Vitals.elixir == "1" end
+self.can_smoke = function() return Vitals.pipe == "1" end
+self.can_tree = function() return Vitals.tree == "1" end
+self.cloaked = function() return Vitals.cloak == "1" end
+self.deaf = function() return Vitals.deaf == "1" end
+self.fallen = function() return Vitals.fallen ~= "0" end
+self.fangbarrier = function() return Vitals.fangbarrier ~= "0" end
+self.has_ability_balance = function() return Vitals.ability_bal == "1" end
+self.has_balance = function() return Vitals.balance == "1" end
+self.has_equilibrium = function() return Vitals.equilibrium == "1" end
+self.has_left_arm = function() return Vitals.left_arm == "1" end
+self.has_right_arm = function() return Vitals.right_arm == "1" end
+self.mad = function() return Vitals.madness == "1" end
+self.mounted = function() return Vitals.mounted == "1" end
+self.phased = function() return Vitals.phased == "1" end
+self.prone = function() return Vitals.prone == "1" end
+self.writhing = function() return Vitals.writhing == "1" end
 
-function gg.processAffs()
-    local Afflictions = gmcp.Char.Afflictions
-    local affs = table.deepcopy(Afflictions.List)
-
-    if not table.contains(affs, Afflictions.Add) then
-        affs[#affs + 1] = Afflictions.Add
-    end
-
-    for index, aff in ipairs(affs) do
-        if Afflictions.Remove.name == aff.name then
-            table.remove(affs, index)
-            break
-        end
-    end
-
-    self.debuffs = affs
-end
-
-
-function gg.processDefs()
-    local Defences = gmcp.Char.Defences
-    local defs = table.deepcopy(Defences.List)
-
-    if not table.contains(defs, Defences.Add) then
-        defs[#defs + 1] = Defences.Add
-    end
-
-    for index, def in ipairs(defs) do
-        if Defences.Remove.name == def.name then
-            table.remove(defs, index)
-            break
-        end
-    end
-
-    self.buffs = defs
-end
-
-
-function gg.processItems(type_filter)
-    type_filter = tostring(type_filter or "")
-    if gmcp.Char.Items.List.location ~= type_filter then return end
-
-    local Items = gmcp.Char.Items
-    local contents = {}
-    local needToAdd = true
-
-    for _, item in ipairs(Items.List.items) do
-        if item.location == type_filter then
-            local this_type_attribs = itemAttribMap[item.attrib or "u"]
-            contents[this_type_attribs][#contents[this_type_attribs] + 1] = item
-            if item.id == Items.add.item.id then needToAdd = false end
-        end
-    end
-
-    if Items.Add and Items.Add.location == type_filter and needToAdd then
-        local item = Items.Add.item
-        local this_type_attribs = itemAttribMap[item.attrib or "u"]
-        contents[this_type_attribs][#contents[this_type_attribs] + 1] = item
-    end
-
-    if Items.Remove and Items.Remove.location == type_filter then
-        local remove_item = Items.Remove.item
-        for attrib_type, subtable in pairs(contents) do
-            for index, item in ipairs(subtable) do
-                if remove_item.id == item.id then
-                    table.remove(subtable, index)
-                    break
-                end
-            end
-        end
-    end
-
-    if Items.Update and Items.Update.location == type_filter then
-        local update_item = Items.Update.item
-        local subtable = contents[itemAttribMap[update_item.attrib or "u"]]
-        for index, item in ipairs(subtable) do
-            if update_item.id == item.id then
-                subtable[index] = item
-                break
-            end
-        end
-    end
-
-    return contents
-end
-
-
-function gg.processNearbyAdventurers()
-    local Room = gmcp.Room
-    local players = {}
-
-    for _, player in ipairs(Room.Players) do
-        players[#players + 1] = player.name
-    end
-
-    if Room.AddPlayer and not table.contains(players, Room.AddPlayer.name) then
-        players[#players + 1] = Room.AddPlayer.name
-    end
-
-    for index, name in ipairs(players) do
-        if Room.RemovePlayer.name == name then
-            table.remove(players, index)
-            break
-        end
-    end
-
-    room.players = table.sort(players)
-end
-
-
-function gg.processTime()
-    local time = table.deepcopy(gmcp.IRE.Time.List)
-    if not time then return end
-
-    for key, _ in pairs(time) do
-        local updated_value = gmcp.IRE.Time.Update[key]
-        if updated_value then time[key] = updated_value end
-    end
-
-    local ordinals = {
-        [1] = "1st", [2] = "2nd", [3] = "3rd",
-        [21] = "21st", [22] = "22nd", [23] = "23rd",
-        [31] = "31st"
-    }
-
-    local ordinal = ordinals[time.day] or (time.day .. "th")
-
-    local months = {"Variach", "Severin", "Ios", "Arios", "Chakros", "Khepary",
-                    "Midsummer", "Lleian", "Lanosian", "Niuran", "Slyphian", "Haernos"}
-    local month = months[time.month]
-
-    local seasons = {
-        "mid-winter", "late winter", "early spring",
-        "mid-spring", "late spring", "early summer",
-        "mid-summer", "late summer", "early autumn",
-        "mid-autumn", "late autumn", "early winter",
-    }
-
-    time.string = (ordinal .." ".. month ..", ".. time.year ..
-                   " (".. seasons[tonumber(time.mon)] ..", ".. time.moonphase ..
-                   ")<br>" .. time.time)
-    gg.time = time
-end
-
-
-function gg.processWho(event, url, body)
-    if event ~= "SysGetHttpDone" or url ~= "https://api.aetolia.com/characters.json" then
-        return
-    end
-
-    gg.who = yajl.to_value(body).characters
-end
-
-
-function gg.setupGMCPEventHandlers()
-    local localPlayerEvents = {"gmcp.Room.Players", "gmcp.Room.AddPlayer", "gmcp.Room.RemovePlayer"}
-    local itemEvents = {"gmcp.Char.Items.List", "gmcp.Char.Items.Add",
-                        "gmcp.Char.Items.Remove", "gmcp.Char.Items.Update"}
-    local selfBuffEvents = {"gmcp.Char.Defences.List", "gmcp.Char.Defences.Add",
-                            "gmcp.Char.Defences.Remove"}
-    local selfDebuffEvents = {"gmcp.Char.Afflictions.List", "gmcp.Char.Afflictions.Add",
-                              "gmcp.Char.Afflictions.Remove"}
-
-    for _, event in ipairs(itemEvents) do
-        registerAnonymousEventHandler(event, function() gg.processItems("room") end)
-    end
-
-    for _, event in ipairs(localPlayerEvents) do
-        registerAnonymousEventHandler(event, gg.processNearbyAdventurers)
-    end
-
-    for _, event in ipairs(selfBuffEvents) do
-        registerAnonymousEventHandler(event, gg.processDefs)
-    end
-
-    for _, event in ipairs(selfDebuffEvents) do
-        registerAnonymousEventHandler(event, gg.processAffs)
-    end
-
-    sendGMCP([[Core.Supports.Add ["IRE.Time 1"] ]])
-    registerAnonymousEventHandler("gmcp.IRE.Time.Update", gg.processTime)
-
-    registerAnonymousEventHandler("sysGetHttpDone", gg.processWho)
-end
-
+self.build = function() return Status.spec .." ".. Status.race .." ".. Status.class end
+self.gold = function() return {banked = tonumber(Status.bank), held = tonumber(Status.gold)} end
+self.stats = {
+    hp = function() return (tonumber(Vitals.hp) / tonumber(Vitals.maxhp)) * 100 end,
+    mp = function() return (tonumber(Vitals.mp) / tonumber(Vitals.maxmp)) * 100 end,
+    ep = function() return (tonumber(Vitals.ep) / tonumber(Vitals.maxep)) * 100 end,
+    wp = function() return (tonumber(Vitals.wp) / tonumber(Vitals.maxwp)) * 100 end,
+    blood = function() return tonumber(Vitals.blood) end,
+    to_next_level = function() return tonumber(Vitals.nl) end
+}
+self.wielding = {
+    left = function() return Vitals.wield_left end,
+    right = function() return Vitals.wield_right end
+}

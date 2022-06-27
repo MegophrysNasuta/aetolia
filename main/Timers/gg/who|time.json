@@ -6,8 +6,8 @@
         "isOffsetTimer": "no"
     },
     "type": "timer",
-    "name": "who",
-    "script": "getHTTP(\"https://api.aetolia.com/characters.json\")",
+    "name": "who|time",
+    "script": "getHTTP(\"https://api.aetolia.com/characters.json\")\nsendGMCP([[IRE.Time.Request]])",
     "command": null,
     "packageName": null,
     "time": "00:00:01.000"

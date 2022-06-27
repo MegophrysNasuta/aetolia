@@ -4,9 +4,9 @@
         "isFolder": "no"
     },
     "type": "alias",
-    "name": "show gg",
-    "script": "local ui = gg.ui\ngg.ui = {}\ndisplay(gg)\ngg.ui = ui",
+    "name": "show gmcp",
+    "script": "display(gmcp)",
     "command": null,
     "packageName": null,
-    "regex": "^gg$"
+    "regex": "^gmcp$"
 }
