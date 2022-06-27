@@ -14,7 +14,7 @@
     },
     "type": "triggergroup",
     "name": "gg",
-    "script": null,
+    "script": "local timeToReturn = tonumber(matches[3] or 4.5)\nif matches[1] == \"You take a drink of an elixir\" then\n    matches[2] = \"Elixir\"\nend\n\nlocal badgeLookup = {\n    Balance={name=\"balBadge\", label=\"BAL\"},\n    Equilibrium={name=\"eqBadge\", label=\"EQ\"},\n    Elixir={name=\"sipBadge\", label=\"SIP\"},\n}\n\nif table.contains(badgeLookup, matches[2]) then\n    local badgeInfo = badgeLookup[matches[2]]\n    local uiWidget = gg.ui[badgeInfo.name]\n    if not uiWidget then error(\"ui widget for \".. matches[2] ..\"(\".. badgeInfo.name ..\") not found\") end\n    uiWidget:cecho(\"<center><\".. gg.ui.offColor ..\">\".. badgeInfo.label ..\"</center>\")\n    if timeToReturn then\n        tempTimer(timeToReturn - 3.05, function()\n            uiWidget:cecho(\"<center><\".. gg.ui.threeSecWarnColor ..\">\".. badgeInfo.label ..\"</center>\")\n        end)\n        tempTimer(timeToReturn - 2.05, function()\n            uiWidget:cecho(\"<center><\".. gg.ui.twoSecWarnColor ..\">\".. badgeInfo.label ..\"</center>\")\n        end)\n        tempTimer(timeToReturn - 1.05, function()\n            uiWidget:cecho(\"<center><\".. gg.ui.oneSecWarnColor ..\">\".. badgeInfo.label ..\"</center>\")\n        end)\n        tempTimer(timeToReturn - 0.05, function()\n            uiWidget:cecho(\"<center><\".. gg.ui.availColor ..\">\".. badgeInfo.label ..\"</center>\")\n        end)\n    end\nend",
     "triggerType": "0",
     "conditonLineDelta": "0",
     "mStayOpen": "0",
@@ -25,6 +25,6 @@
     "mSoundFile": null,
     "colorTriggerFgColor": "#000000",
     "colorTriggerBgColor": "#000000",
-    "regexCodeList": null,
-    "regexCodePropertyList": null
+    "regexCodeList": "\n\t\t\t\t",
+    "regexCodePropertyList": "\n\t\t\t\t"
 }

@@ -5,6 +5,10 @@ gg.ui.availColor = "cyan"
 gg.ui.infoColor = "white"
 gg.ui.offColor = "grey"
 gg.ui.roomColor = "DarkOrange"
+gg.ui.timeColor = "LightSkyBlue"
+gg.ui.oneSecWarnColor = "red"
+gg.ui.twoSecWarnColor = "orange"
+gg.ui.threeSecWarnColor = "yellow"
 
 gg.self = gg.self or {}
 gg.target = gg.target or {}
@@ -47,6 +51,7 @@ function gg.drawUIBottomPanel()
             name="gg.ui.bottomPanel", x=0, y="-100", width="67%", height="10%"})
     end
 
+    local Status = gmcp.Char.Status
     local Vitals = gmcp.Char.Vitals
     local color
 
@@ -141,6 +146,15 @@ function gg.drawUIBottomPanel()
         gg.ui.treeBadge:echo("<center>TREE</center>")
         gg.ui.treeBadge:setClickCallback(function() send("touch tree") end)
     end
+
+    if not gg.ui.lvlProgressBar then
+        gg.ui.lvlProgressBar = Geyser.Gauge:new({
+            name="gg.ui.lvlProgressBar", x="75%", y=0, width="25%", height=33,
+            fontSize=10, bgColor="transparent"}, gg.ui.bottomPanel)
+        gg.ui.lvlProgressBar.front:setStyleSheet("backround-color: silver;")
+        gg.ui.lvlProgressBar.back:setStyleSheet("background-color: black;")
+    end
+    gg.ui.lvlProgressBar:setValue(tonumber(Vitals.nl), 100, "<center>Lvl ".. Status.level .."</center>")
 
     -- row 2
     if not gg.ui.hpBar then
@@ -254,21 +268,21 @@ function gg.drawUIRightPanel()
                            Status.order .."</center>"))
 
     -- row 3
-    if not gg.ui.newsBadge then
-        gg.ui.newsBadge = Geyser.Label:new({
-            name="gg.ui.newsBadge", x=0, y=36, width="25%", height=18, fontSize=10,
+    if not gg.ui.defsBadge then
+        gg.ui.defsBadge = Geyser.Label:new({
+            name="gg.ui.defsBadge", x=0, y=36, width="25%", height=18, fontSize=10,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-        gg.ui.newsBadge:setClickCallback(function() send("nstat") end)
+        gg.ui.defsBadge:setClickCallback(function() send("def") end)
     end
-    gg.ui.newsBadge:echo("<center>Unread news: ".. Status.unread_news .."</center>")
+    gg.ui.defsBadge:echo("<center>Defs: ".. tostring(#gg.self.buffs) .."</center>")
 
-    if not gg.ui.msgsBadge then
-        gg.ui.msgsBadge = Geyser.Label:new({
-            name="gg.ui.msgsBadge", x="25%", y=36, width="25%", height=18, fontSize=10,
+    if not gg.ui.affsBadge then
+        gg.ui.affsBadge = Geyser.Label:new({
+            name="gg.ui.affsBadge", x="25%", y=36, width="25%", height=18, fontSize=10,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
-        gg.ui.msgsBadge:setClickCallback(function() send("rmsg") end)
+        gg.ui.affsBadge:setClickCallback(function() send("diagnose") end)
     end
-    gg.ui.msgsBadge:echo("<center>Unread msgs: ".. Status.unread_msgs .."</center>")
+    gg.ui.affsBadge:echo("<center>Affs: ".. tostring(#gg.self.debuffs) .."</center>")
 
     if not gg.ui.goldBadge then
         gg.ui.goldBadge = Geyser.Label:new({
@@ -279,9 +293,31 @@ function gg.drawUIRightPanel()
     gg.ui.goldBadge:echo("<center>Gold: " .. Status.gold .." - Banked: ".. Status.bank .."</center>")
 
     -- row 4
+    if not gg.ui.dateBadge then
+        gg.ui.dateBadge = Geyser.Label:new({
+            name="gg.ui.dateBadge", x=0, y=54, width="100%", height=18, fontSize=10,
+            fgColor=gg.ui.timeColor}, gg.ui.rightPanel)
+        gg.ui.dateBadge:setClickCallback(function() send("calendar") end)
+    end
+    if gmcp.IRE and gmcp.IRE.Time then
+        gg.ui.dateBadge:echo("<center>".. gg.time.date .."</center>")
+    end
+
+    -- row 5
+    if not gg.ui.timeBadge then
+        gg.ui.timeBadge = Geyser.Label:new({
+            name="gg.ui.timeBadge", x=0, y=72, width="100%", height=18, fontSize=10,
+            fgColor=gg.ui.timeColor}, gg.ui.rightPanel)
+        gg.ui.timeBadge:setClickCallback(function() send("calendar") end)
+    end
+    if gmcp.IRE and gmcp.IRE.Time then
+        gg.ui.timeBadge:echo("<center>".. gg.time.time .."</center>")
+    end
+
+    -- row 6
     if not gg.ui.roomBadge then
         gg.ui.roomBadge = Geyser.Label:new({
-            name="gg.ui.roomBadge", x=0, y=54, width="100%", height=18, fontSize=10,
+            name="gg.ui.roomBadge", x=0, y=90, width="100%", height=18, fontSize=10,
             fgColor=gg.ui.roomColor}, gg.ui.rightPanel)
         gg.ui.roomBadge:setClickCallback(function() send("look") end)
     end
@@ -294,12 +330,52 @@ function gg.drawUIRightPanel()
                            ">)</center>"))
 
     -- map
-    openMapWidget(width * .7, 214, width * .34, height * .25)
+    openMapWidget(width * .7, 250, width * .34, 400)
+
+    -- targets window
+    if not gg.ui.roomContentsWindow then
+        gg.ui.roomContentsWindow = Geyser.MiniConsole:new({
+            name="gg.ui.roomContentsWindow", scrollBar=true, autoWrap=true,
+            x=width * .66, y=525, width=width * .34, height=400, fontSize=13,
+            fgColor=gg.ui.infoColor, wrapAt=80})
+    end
+    gg.ui.roomContentsWindow:clear()
+    gg.ui.roomContentsWindow:cecho("Players: ")
+    if gg.self.room and gg.self.room.players then
+        for _, player in ipairs(gg.self.room.players) do
+            cechoLink("gg.ui.roomContentsWindow", player.name,
+                      function()
+                        send("honours ".. player.name)
+                        cechoLink("<red>[ClickToTarget] ".. player.name,
+                                  function() send("st ".. player.name) end, "", true)
+                      end, "", true)
+            if _ ~= #gg.self.room.players then
+                gg.ui.roomContentsWindow:cecho(", ")
+            end
+        end
+    end
+    if gg.self.room and gg.self.room.contents then
+        for obj_type, objs in pairs(gg.self.room.contents) do
+            gg.ui.roomContentsWindow:cecho("\n\n".. obj_type:title() ..": ")
+            for _, obj in ipairs(objs) do
+                cechoLink("gg.ui.roomContentsWindow", obj.name,
+                          function()
+                            send("p ".. obj.id)
+                            cechoLink("<red>[ClickToTarget] ".. obj.name,
+                                      function() send("st ".. obj.id) end, "", true)
+                          end, "", true)
+                if _ ~= #objs then
+                    gg.ui.roomContentsWindow:cecho(", ")
+                end
+            end
+        end
+    end
 end
 
+
 function gg.init()
-    if not gmcp.Char then
-        echo("Waiting to init...")
+    if not gmcp.Char or not gmcp.Room then
+        echo("Waiting for GMCP to fully load before initializing UI...")
         tempTimer(2, gg.init)
         return
     end
@@ -348,6 +424,7 @@ function gg.init()
 
     gg.setupGMCPEventHandlers()
     gg.refreshUI()
+    gg.refreshSlowAPIs()
 end
 
 
@@ -428,10 +505,10 @@ function gg.processItems(type_filter)
         local this_type_attribs = itemAttribMap[item.attrib or "u"]
         contents[this_type_attribs] = contents[this_type_attribs] or {}
         contents[this_type_attribs][#contents[this_type_attribs] + 1] = item
-        if Items.Add and item.id == Items.Add.Item.id then needToAdd = false end
+        if Items.Add and Items.Add.Item and item.id == Items.Add.Item.id then needToAdd = false end
     end
 
-    if Items.Add and Items.Add.location == type_filter and needToAdd then
+    if Items.Add and Items.Add.Item and Items.Add.location == type_filter and needToAdd then
         local item = Items.Add.item
         local this_type_attribs = itemAttribMap[item.attrib or "u"]
         contents[this_type_attribs] = contents[this_type_attribs] or {}
@@ -488,18 +565,20 @@ function gg.processNearbyAdventurers()
     end
 
     table.sort(players)
-    room.players = players
+    gg.self.room.players = players
 end
 
 
 function gg.processTime()
-    if not gmcp.IRE.Time.Update then return end
+    if not gmcp.IRE.Time then return end
     local time = table.deepcopy(gmcp.IRE.Time.List)
     if not time then return end
 
-    for key, _ in pairs(time) do
-        local updated_value = gmcp.IRE.Time.Update[key]
-        if updated_value then time[key] = updated_value end
+    if gmcp.IRE.Time.Update then
+        for key, _ in pairs(time) do
+            local updated_value = gmcp.IRE.Time.Update[key]
+            if updated_value then time[key] = updated_value end
+        end
     end
 
     local ordinals = {
@@ -549,6 +628,13 @@ function gg.refreshUI()
     gg.ui.updateTimer = tempTimer(gg.ui.refreshInterval or .1, gg.refreshUI)
 end
 
+function gg.refreshSlowAPIs()
+    getHTTP("https://api.aetolia.com/characters.json")  -- fetch who list
+    sendGMCP([[IRE.Time.Request]])  -- request time in game
+    if gg.ui.slowUpdateTimer then killTimer(gg.ui.slowUpdateTimer) end
+    gg.ui.slowUpdateTimer = tempTimer(1, gg.refreshSlowAPIs)
+end
+
 
 function gg.round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
@@ -569,7 +655,7 @@ function gg.setupGMCPEventHandlers()
     for _, event in ipairs(itemEvents) do
         deleteNamedEventHandler("gg", event)
         registerNamedEventHandler("gg", event, event, function()
-            room.contents = gg.processItems("room")
+            gg.self.room.contents = gg.processItems("room")
         end)
     end
 
@@ -626,3 +712,4 @@ end
 deleteNamedEventHandler("gg.init", "sysConnectionEvent")
 registerNamedEventHandler("gg.init", "sysConnectionEvent", "sysConnectionEvent", function()
     tempTimer(2, gg.init) end)
+
