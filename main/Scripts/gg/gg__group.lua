@@ -1,8 +1,13 @@
 enableTrigger("gg.autonews")
-enableTrigger("gg.automore")
 gg = gg or {}
+if io.exists(getMudletHomeDir() .."/adb.lua") then
+    table.load(getMudletHomeDir() .."/adb.lua", gg.adb)
+end
+gg.adb = gg.adb or {}
 gg.ui = gg.ui or {}
+gg.defKeepupInterval = 2
 gg.ui.refreshInterval = .1
+
 gg.ui.availColor = "cyan"
 gg.ui.infoColor = "white"
 gg.ui.keepColor = "SpringGreen"
@@ -13,6 +18,12 @@ gg.ui.timeColor = "LightSkyBlue"
 gg.ui.oneSecWarnColor = "red"
 gg.ui.twoSecWarnColor = "orange"
 gg.ui.threeSecWarnColor = "yellow"
+
+gg.ui.whoColors = gg.ui.whoColors or {}
+gg.ui.whoColors.Bloodloch = "ansiRed"
+gg.ui.whoColors.Spinesreach = "ansiMagenta"
+gg.ui.whoColors.Duiran = "DarkOliveGreen"
+gg.ui.whoColors.Enorian = "SteelBlue"
 
 gg.self = gg.self or {}
 gg.target = gg.target or {}
@@ -28,6 +39,9 @@ gg.self.room.contents = gg.self.room.contents or {}
 gg.self.room.players = gg.self.room.players or {}
 gg.self.skills = gg.self.skills or {}
 gg.self.vitals = gg.self.vitals or {}
+if io.exists(getMudletHomeDir() .."/keepDefs.lua") then
+    table.load(getMudletHomeDir() .."/keepDefs.lua", gg.self.keepup)
+end
 
 gg.target.buffs = gg.target.buffs or {}
 gg.target.debuffs = gg.target.debuffs or {}
@@ -65,7 +79,7 @@ function gg.drawUIBottomPanel()
     if gg.self.has_balance() then color = gg.ui.availColor else color = gg.ui.offColor end
     if not gg.ui.balBadge then
         gg.ui.balBadge = Geyser.Label:new({
-            name="gg.ui.balBadge", x=0, y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.balBadge", x=0, y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.balBadge:echo("<center>BAL</center>")
         gg.ui.balBadge:setClickCallback(function() send("") end)
@@ -74,7 +88,7 @@ function gg.drawUIBottomPanel()
     if gg.self.has_equilibrium() then color = gg.ui.availColor else color = gg.ui.offColor end
     if not gg.ui.eqBadge then
         gg.ui.eqBadge = Geyser.Label:new({
-            name="gg.ui.eqBadge", x="7.5%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.eqBadge", x="7.5%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.eqBadge:echo("<center>EQ</center>")
         gg.ui.eqBadge:setClickCallback(function() send("") end)
@@ -83,7 +97,7 @@ function gg.drawUIBottomPanel()
     if gg.self.can_eat() then color = gg.ui.availColor else color = gg.ui.offColor end
     if not gg.ui.eatBadge then
         gg.ui.eatBadge = Geyser.Label:new({
-            name="gg.ui.eatBadge", x="15%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.eatBadge", x="15%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.eatBadge:echo("<center>EAT</center>")
         gg.ui.eatBadge:setClickCallback(function() send("") end)
@@ -92,7 +106,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.focusBadge then
         if gg.self.can_focus() then color = gg.ui.availColor else color = gg.ui.offColor end
         gg.ui.focusBadge = Geyser.Label:new({
-            name="gg.ui.focusBadge", x="22.5%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.focusBadge", x="22.5%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.focusBadge:echo("<center>FOCUS</center>")
         gg.ui.focusBadge:setClickCallback(function() send("focus") end)
@@ -101,7 +115,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.mossBadge then
         if gg.self.can_moss() then color = gg.ui.availColor else color = gg.ui.offColor end
         gg.ui.mossBadge = Geyser.Label:new({
-            name="gg.ui.mossBadge", x="30%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.mossBadge", x="30%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.mossBadge:echo("<center>MOSS</center>")
         gg.ui.mossBadge:setClickCallback(function() send("touch moss") end)
@@ -110,7 +124,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.renewBadge then
         if gg.self.can_renew() then color = gg.ui.availColor else color = gg.ui.offColor end
         gg.ui.renewBadge = Geyser.Label:new({
-            name="gg.ui.renewBadge", x="37.5%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.renewBadge", x="37.5%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.renewBadge:echo("<center>RENEW</center>")
         gg.ui.renewBadge:setClickCallback(function() send("renew") end)
@@ -119,7 +133,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.salveBadge then
         if gg.self.can_salve() then color = gg.ui.availColor else color = gg.ui.offColor end
         gg.ui.salveBadge = Geyser.Label:new({
-            name="gg.ui.salveBadge", x="45%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.salveBadge", x="45%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.salveBadge:echo("<center>SALVE</center>")
         gg.ui.salveBadge:setClickCallback(function() send("") end)
@@ -128,7 +142,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.sipBadge then
         if gg.self.can_sip() then color = gg.ui.availColor else color = gg.ui.offColor end
         gg.ui.sipBadge = Geyser.Label:new({
-            name="gg.ui.sipBadge", x="52.5%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.sipBadge", x="52.5%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.sipBadge:echo("<center>SIP</center>")
         gg.ui.sipBadge:setClickCallback(function() send("") end)
@@ -137,7 +151,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.smokeBadge then
         if gg.self.can_smoke() then color = gg.ui.availColor else color = gg.ui.offColor end
         gg.ui.smokeBadge = Geyser.Label:new({
-            name="gg.ui.smokeBadge", x="60%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.smokeBadge", x="60%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.smokeBadge:echo("<center>SMOKE</center>")
         gg.ui.smokeBadge:setClickCallback(function() send("") end)
@@ -146,7 +160,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.treeBadge then
         if gg.self.can_tree() then color = gg.ui.availColor else color = gg.ui.offColor end
         gg.ui.treeBadge = Geyser.Label:new({
-            name="gg.ui.treeBadge", x="67.5%", y=0, width="7.5%", height=33, fontSize=10,
+            name="gg.ui.treeBadge", x="67.5%", y=0, width="7.5%", height=33, fontSize=8,
             fgColor=color, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.treeBadge:echo("<center>TREE</center>")
         gg.ui.treeBadge:setClickCallback(function() send("touch tree") end)
@@ -155,7 +169,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.lvlProgressBar then
         gg.ui.lvlProgressBar = Geyser.Gauge:new({
             name="gg.ui.lvlProgressBar", x="75%", y=0, width="25%", height=33,
-            fontSize=10, bgColor="transparent"}, gg.ui.bottomPanel)
+            fontSize=8, bgColor="transparent"}, gg.ui.bottomPanel)
         gg.ui.lvlProgressBar.front:setStyleSheet("backround-color: silver;")
         gg.ui.lvlProgressBar.back:setStyleSheet("background-color: black;")
     end
@@ -165,7 +179,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.hpBar then
         gg.ui.hpBar = Geyser.Gauge:new({
             name="gg.ui.hpBar", x=0, y=33, width="32%", height=33,
-            fontSize=10}, gg.ui.bottomPanel)
+            fontSize=8}, gg.ui.bottomPanel)
         gg.ui.hpBar.front:setStyleSheet("background-color: green;")
         gg.ui.hpBar.back:setStyleSheet("background-color: black;")
     end
@@ -175,7 +189,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.mpBar then
         gg.ui.mpBar = Geyser.Gauge:new({
             name="gg.ui.mpBar", x="33%", y=33, width="32%", height=33,
-            fontSize=10}, gg.ui.bottomPanel)
+            fontSize=8}, gg.ui.bottomPanel)
         gg.ui.mpBar.front:setStyleSheet("background-color: navy;")
         gg.ui.mpBar.back:setStyleSheet("background-color: black;")
     end
@@ -185,7 +199,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.bloodBar then
         gg.ui.bloodBar = Geyser.Gauge:new({
             name="gg.ui.bloodBar", x="66%", y=33, width="32%", height=33,
-            fontSize=10}, gg.ui.bottomPanel)
+            fontSize=8}, gg.ui.bottomPanel)
         gg.ui.bloodBar.front:setStyleSheet("background-color: maroon;")
         gg.ui.bloodBar.back:setStyleSheet("background-color: black;")
     end
@@ -196,7 +210,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.epBar then
         gg.ui.epBar = Geyser.Gauge:new({
             name="gg.ui.epBar", x=0, y=66, width="32%", height=33,
-            fontSize=10}, gg.ui.bottomPanel)
+            fontSize=8}, gg.ui.bottomPanel)
         gg.ui.epBar.front:setStyleSheet("background-color: goldenrod;")
         gg.ui.epBar.back:setStyleSheet("background-color: black;")
     end
@@ -206,7 +220,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.wpBar then
         gg.ui.wpBar = Geyser.Gauge:new({
             name="gg.ui.wpBar", x="33%", y=66, width="32%", height=33,
-            fontSize=10}, gg.ui.bottomPanel)
+            fontSize=8}, gg.ui.bottomPanel)
         gg.ui.wpBar.front:setStyleSheet("background-color: purple;")
         gg.ui.wpBar.back:setStyleSheet("background-color: black;")
     end
@@ -216,7 +230,7 @@ function gg.drawUIBottomPanel()
     if not gg.ui.soulBar then
         gg.ui.soulBar = Geyser.Gauge:new({
             name="gg.ui.soulBar", x="66%", y=66, width="32%", height=33,
-            fontSize=10}, gg.ui.bottomPanel)
+            fontSize=8}, gg.ui.bottomPanel)
         gg.ui.soulBar.front:setStyleSheet("background-color: dodgerblue;")
         gg.ui.soulBar.back:setStyleSheet("background-color: black;")
     end
@@ -231,7 +245,7 @@ function gg.drawUIRightPanel()
             name="gg.ui.rightPanel", x="-33%", y=0, width="33%", height="100%"})
     end
 
-    local RoomInfo = gmcp.Room.Info
+    local RoomInfo = (gmcp.Room and gmcp.Room.Info) or {}
     local Status = gmcp.Char.Status
     local width, height = getMainWindowSize()
 
@@ -239,7 +253,7 @@ function gg.drawUIRightPanel()
     -- row 1
     if not gg.ui.nameBadge then
         gg.ui.nameBadge = Geyser.Label:new({
-            name="gg.ui.nameBadge", x=0, y=0, width="60%", height=18, fontSize=10,
+            name="gg.ui.nameBadge", x=0, y=0, width="60%", height=18, fontSize=8,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
         gg.ui.nameBadge:setClickCallback(function() send("honours ".. Status.name ) end)
     end
@@ -247,7 +261,7 @@ function gg.drawUIRightPanel()
 
     if not gg.ui.cityBadge then
         gg.ui.cityBadge = Geyser.Label:new({
-            name="gg.ui.cityBadge", x="60%", y=0, width="40%", height=18, fontSize=10,
+            name="gg.ui.cityBadge", x="60%", y=0, width="40%", height=18, fontSize=8,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
         gg.ui.cityBadge:setClickCallback(function() send("help ".. Status.city ) end)
     end
@@ -256,7 +270,7 @@ function gg.drawUIRightPanel()
     -- row 2
     if not gg.ui.specBadge then
         gg.ui.specBadge = Geyser.Label:new({
-            name="gg.ui.specBadge", x=0, y=18, width="50%", height=18, fontSize=10,
+            name="gg.ui.specBadge", x=0, y=18, width="50%", height=18, fontSize=8,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
         gg.ui.specBadge:setClickCallback(function() send("honours ".. Status.name) end)
     end
@@ -265,7 +279,7 @@ function gg.drawUIRightPanel()
 
     if not gg.ui.houseBadge then
         gg.ui.houseBadge = Geyser.Label:new({
-            name="gg.ui.houseBadge", x="50%", y=18, width="50%", height=18, fontSize=10,
+            name="gg.ui.houseBadge", x="50%", y=18, width="50%", height=18, fontSize=8,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
         gg.ui.houseBadge:setClickCallback(function() send("honours ".. Status.name) end)
     end
@@ -275,7 +289,7 @@ function gg.drawUIRightPanel()
     -- row 3
     if not gg.ui.defsBadge then
         gg.ui.defsBadge = Geyser.Label:new({
-            name="gg.ui.defsBadge", x=0, y=36, width="25%", height=18, fontSize=10,
+            name="gg.ui.defsBadge", x=0, y=36, width="25%", height=18, fontSize=8,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
         gg.ui.defsBadge:setClickCallback(function() send("def") end)
     end
@@ -283,7 +297,7 @@ function gg.drawUIRightPanel()
 
     if not gg.ui.affsBadge then
         gg.ui.affsBadge = Geyser.Label:new({
-            name="gg.ui.affsBadge", x="25%", y=36, width="25%", height=18, fontSize=10,
+            name="gg.ui.affsBadge", x="25%", y=36, width="25%", height=18, fontSize=8,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
         gg.ui.affsBadge:setClickCallback(function() send("diagnose") end)
     end
@@ -291,7 +305,7 @@ function gg.drawUIRightPanel()
 
     if not gg.ui.goldBadge then
         gg.ui.goldBadge = Geyser.Label:new({
-            name="gg.ui.goldBadge", x="50%", y=36, width="50%", height=18, fontSize=10,
+            name="gg.ui.goldBadge", x="50%", y=36, width="50%", height=18, fontSize=8,
             fgColor=gg.ui.infoColor}, gg.ui.rightPanel)
         gg.ui.goldBadge:setClickCallback(function() sendAll("currency report", "credit report") end)
     end
@@ -300,7 +314,7 @@ function gg.drawUIRightPanel()
     -- row 4
     if not gg.ui.dateBadge then
         gg.ui.dateBadge = Geyser.Label:new({
-            name="gg.ui.dateBadge", x=0, y=54, width="100%", height=18, fontSize=10,
+            name="gg.ui.dateBadge", x=0, y=54, width="100%", height=18, fontSize=8,
             fgColor=gg.ui.timeColor}, gg.ui.rightPanel)
         gg.ui.dateBadge:setClickCallback(function() send("calendar") end)
     end
@@ -311,7 +325,7 @@ function gg.drawUIRightPanel()
     -- row 5
     if not gg.ui.timeBadge then
         gg.ui.timeBadge = Geyser.Label:new({
-            name="gg.ui.timeBadge", x=0, y=72, width="100%", height=18, fontSize=10,
+            name="gg.ui.timeBadge", x=0, y=72, width="100%", height=18, fontSize=8,
             fgColor=gg.ui.timeColor}, gg.ui.rightPanel)
         gg.ui.timeBadge:setClickCallback(function() send("calendar") end)
     end
@@ -322,44 +336,33 @@ function gg.drawUIRightPanel()
     -- row 6
     if not gg.ui.roomBadge then
         gg.ui.roomBadge = Geyser.Label:new({
-            name="gg.ui.roomBadge", x=0, y=90, width="100%", height=18, fontSize=10,
+            name="gg.ui.roomBadge", x=0, y=90, width="100%", height=36, fontSize=8,
             fgColor=gg.ui.roomColor}, gg.ui.rightPanel)
         gg.ui.roomBadge:setClickCallback(function() send("look") end)
+        gg.ui.roomBadge:setStyleSheet("qproperty-wordWrap: true;")
     end
 
     local exits = {}
-    for dir, roomNum in pairs(RoomInfo.exits) do exits[#exits + 1] = dir end
-    gg.ui.roomBadge:cecho(("<center><".. gg.ui.roomColor ..">".. RoomInfo.name .." ("..
-                           RoomInfo.environment ..", ".. RoomInfo.area .."; exits: <"..
+    for dir, roomNum in pairs(RoomInfo.exits or {}) do exits[#exits + 1] = dir end
+    gg.ui.roomBadge:cecho(("<center><".. gg.ui.roomColor ..">".. (RoomInfo.name or "?") .." ("..
+                           (RoomInfo.environment or "unknown") ..", ".. (RoomInfo.area or "unknown") .."; exits: <"..
                            gg.ui.infoColor ..">"..tostring(#exits) .."<".. gg.ui.roomColor ..
                            ">)</center>"))
 
     -- map
-    openMapWidget(width * .7, 250, width * .34, 400)
+    openMapWidget(width * .67, 268, width * .33, 380)
 
     -- targets window
     if not gg.ui.roomContentsWindow then
         gg.ui.roomContentsWindow = Geyser.MiniConsole:new({
             name="gg.ui.roomContentsWindow", scrollBar=true, autoWrap=true,
-            x=width * .66, y=525, width=width * .34, height=400, fontSize=13,
-            fgColor=gg.ui.infoColor, wrapAt=80})
+            x="-33%", y=543, width="33%", height=400, fontSize=8,
+            fgColor=gg.ui.infoColor, color="black", wrapAt=80})
     end
     gg.ui.roomContentsWindow:clear()
-    gg.ui.roomContentsWindow:cecho("Players: ")
-    if gg.self.room and gg.self.room.players then
-        for _, player in ipairs(gg.self.room.players) do
-            cechoLink("gg.ui.roomContentsWindow", player.name,
-                      function()
-                        sendAll("look at ".. player.name, "st ".. player.name)
-                      end, "", true)
-            if _ ~= #gg.self.room.players then
-                gg.ui.roomContentsWindow:cecho(", ")
-            end
-        end
-    end
     if gg.self.room and gg.self.room.contents then
         for obj_type, objs in pairs(gg.self.room.contents) do
-            gg.ui.roomContentsWindow:cecho("\n\n".. obj_type:title() ..": ")
+            gg.ui.roomContentsWindow:cecho("\n".. obj_type:title() ..": ")
             for _, obj in ipairs(objs) do
                 cechoLink("gg.ui.roomContentsWindow", obj.name,
                           function()
@@ -367,76 +370,118 @@ function gg.drawUIRightPanel()
                           end, "", true)
                 if _ ~= #objs then
                     gg.ui.roomContentsWindow:cecho(", ")
+                else
+                    gg.ui.roomContentsWindow:cecho("\n")
                 end
             end
         end
     end
-
-    if gg.who then
-        gg.ui.roomContentsWindow:cecho("\n\nWho: ")
-        for _, player in ipairs(gg.who) do
+    gg.ui.roomContentsWindow:cecho("\nPlayers: ")
+    if gg.self.room and gg.self.room.players then
+        for _, player in ipairs(gg.self.room.players) do
             cechoLink("gg.ui.roomContentsWindow", player,
-                      function() send("honours ".. player) end, "", true)
-            if _ ~= #gg.who then
+                      function() sendAll("look at ".. player, "st ".. player) end, "", true)
+            if _ ~= #gg.self.room.players then
                 gg.ui.roomContentsWindow:cecho(", ")
             end
         end
+    end
+
+    -- who window
+    if not gg.ui.whoWindow then
+        gg.ui.whoWindow = Geyser.MiniConsole:new({
+            name="gg.ui.whoWindow", scrollBar=true, autoWrap=true, color="black",
+            x="-33%", y=950, width="33%", height=200, fontSize=8,
+            fgColor=gg.ui.infoColor, wrapAt=80})
+    end
+    gg.ui.whoWindow:clear()
+    if gg.ready and gg.who then
+        for _, player in ipairs(gg.who) do
+            local color = "white"
+            local extraFmt = ""
+            if gg.adb[player] then
+                if gg.adb[player].city then
+                    color = gg.ui.whoColors[gg.adb[player].city]
+                end
+                if gg.adb[player].city_enemy then
+                    extraFmt = extraFmt .. "<i>"
+                end
+                if gg.adb[player].enemy then
+                    extraFmt = extraFmt .. "<b>"
+                end
+            end
+            cechoLink("gg.ui.whoWindow", "<".. color ..">".. extraFmt .. player,
+                      function() expandAlias("whois ".. player) end, "", true)
+            if _ ~= #gg.who then
+                gg.ui.whoWindow:cecho(", ")
+            end
+        end
+    end
+
+    -- chat window
+    if not gg.ui.chatConsole then
+        local width, _ = getMainWindowSize()
+        gg.ui.chatConsole = Geyser.MiniConsole:new({
+            name="gg.ui.chatConsole", scrollBar=true, autoWrap=true, color="black",
+            x=width * .67, y=1155, width=width * .33, height=400, fontSize=8,
+            fgColor=gg.ui.infoColor, wrapAt=80})
     end
 end
 
 
 function gg.init()
-    if not gmcp.Char or not gmcp.Room then
+    if not gmcp.Char then
         echo("Waiting for GMCP to fully load before initializing UI...")
         tempTimer(2, gg.init)
         return
     end
-    local Status = gmcp.Char.Status
-    local Vitals = gmcp.Char.Vitals
 
-    gg.self.bleeding = function() return Vitals.bleeding ~= "0" end
-    gg.self.blind = function() return Vitals.blind == "1" end
-    gg.self.can_eat = function() return Vitals.herb == "1" end
-    gg.self.can_focus = function() return Vitals.focus == "1" end
-    gg.self.can_moss = function() return Vitals.moss == "1" end
-    gg.self.can_renew = function() return Vitals.renew == "1" end
-    gg.self.can_salve = function() return Vitals.salve == "1" end
-    gg.self.can_sip = function() return Vitals.elixir == "1" end
-    gg.self.can_smoke = function() return Vitals.pipe == "1" end
-    gg.self.can_tree = function() return Vitals.tree == "1" end
-    gg.self.cloaked = function() return Vitals.cloak == "1" end
-    gg.self.deaf = function() return Vitals.deaf == "1" end
-    gg.self.fallen = function() return Vitals.fallen ~= "0" end
-    gg.self.fangbarrier = function() return Vitals.fangbarrier ~= "0" end
-    gg.self.has_ability_balance = function() return Vitals.ability_bal == "1" end
-    gg.self.has_balance = function() return Vitals.balance == "1" end
-    gg.self.has_equilibrium = function() return Vitals.equilibrium == "1" end
-    gg.self.has_left_arm = function() return Vitals.left_arm == "1" end
-    gg.self.has_right_arm = function() return Vitals.right_arm == "1" end
-    gg.self.mad = function() return Vitals.madness == "1" end
-    gg.self.mounted = function() return Vitals.mounted == "1" end
-    gg.self.phased = function() return Vitals.phased == "1" end
-    gg.self.prone = function() return Vitals.prone == "1" end
-    gg.self.writhing = function() return Vitals.writhing == "1" end
+    gg.self.bleeding = function() return gmcp.Char.Vitals.bleeding ~= "0" end
+    gg.self.blind = function() return gmcp.Char.Vitals.blind == "1" end
+    gg.self.can_eat = function() return gmcp.Char.Vitals.herb == "1" end
+    gg.self.can_focus = function() return gmcp.Char.Vitals.focus == "1" end
+    gg.self.can_moss = function() return gmcp.Char.Vitals.moss == "1" end
+    gg.self.can_renew = function() return gmcp.Char.Vitals.renew == "1" end
+    gg.self.can_salve = function() return gmcp.Char.Vitals.salve == "1" end
+    gg.self.can_sip = function() return gmcp.Char.Vitals.elixir == "1" end
+    gg.self.can_smoke = function() return gmcp.Char.Vitals.pipe == "1" end
+    gg.self.can_tree = function() return gmcp.Char.Vitals.tree == "1" end
+    gg.self.cloaked = function() return gmcp.Char.Vitals.cloak == "1" end
+    gg.self.deaf = function() return gmcp.Char.Vitals.deaf == "1" end
+    gg.self.fallen = function() return gmcp.Char.Vitals.fallen ~= "0" end
+    gg.self.fangbarrier = function() return gmcp.Char.Vitals.fangbarrier ~= "0" end
+    gg.self.has_ability_balance = function() return gmcp.Char.Vitals.ability_bal == "1" end
+    gg.self.has_balance = function() return gmcp.Char.Vitals.balance == "1" end
+    gg.self.has_equilibrium = function() return gmcp.Char.Vitals.equilibrium == "1" end
+    gg.self.has_left_arm = function() return gmcp.Char.Vitals.left_arm == "1" end
+    gg.self.has_right_arm = function() return gmcp.Char.Vitals.right_arm == "1" end
+    gg.self.mad = function() return gmcp.Char.Vitals.madness == "1" end
+    gg.self.mounted = function() return gmcp.Char.Vitals.mounted == "1" end
+    gg.self.phased = function() return gmcp.Char.Vitals.phased == "1" end
+    gg.self.prone = function() return gmcp.Char.Vitals.prone == "1" end
+    gg.self.writhing = function() return gmcp.Char.Vitals.writhing == "1" end
 
-    gg.self.build = function() return Status.spec .." ".. Status.race .." ".. Status.class end
-    gg.self.gold = function() return {banked = tonumber(Status.bank), held = tonumber(Status.gold)} end
+    gg.self.build = function() return gmcp.Char.Status.spec .." ".. gmcp.Char.Status.race .." ".. gmcp.Char.Status.class end
+    gg.self.gold = function() return {banked = tonumber(gmcp.Char.Status.bank), held = tonumber(gmcp.Char.Status.gold)} end
     gg.self.stats = {
-        hp = function() return (tonumber(Vitals.hp) / tonumber(Vitals.maxhp)) * 100 end,
-        mp = function() return (tonumber(Vitals.mp) / tonumber(Vitals.maxmp)) * 100 end,
-        ep = function() return (tonumber(Vitals.ep) / tonumber(Vitals.maxep)) * 100 end,
-        wp = function() return (tonumber(Vitals.wp) / tonumber(Vitals.maxwp)) * 100 end,
-        blood = function() return tonumber(Vitals.blood) end,
-        to_next_level = function() return tonumber(Vitals.nl) end
+        hp = function() return (tonumber(gmcp.Char.Vitals.hp) / tonumber(gmcp.Char.Vitals.maxhp)) * 100 end,
+        mp = function() return (tonumber(gmcp.Char.Vitals.mp) / tonumber(gmcp.Char.Vitals.maxmp)) * 100 end,
+        ep = function() return (tonumber(gmcp.Char.Vitals.ep) / tonumber(gmcp.Char.Vitals.maxep)) * 100 end,
+        wp = function() return (tonumber(gmcp.Char.Vitals.wp) / tonumber(gmcp.Char.Vitals.maxwp)) * 100 end,
+        blood = function() return tonumber(gmcp.Char.Vitals.blood) end,
+        to_next_level = function() return tonumber(gmcp.Char.Vitals.nl) end
     }
     gg.self.wielding = {
-        left = function() return Vitals.wield_left end,
-        right = function() return Vitals.wield_right end
+        left = function() return gmcp.Char.Vitals.wield_left end,
+        right = function() return gmcp.Char.Vitals.wield_right end
     }
 
     gg.setupGMCPEventHandlers()
     gg.refreshUI()
     gg.refreshSlowAPIs()
+    gg.updateADBTriggers()
+    send("def")
+    tempTimer(5, function() send("look") gg.ready = true end)
 end
 
 
@@ -459,7 +504,7 @@ function gg.keepDef(def, command)
 end
 
 
-function gg.loseDef(def, command)
+function gg.loseDef(def)
     for index, defInfo in ipairs(gg.self.keepup) do
         if defInfo.name == def then
             table.remove(gg.self.keepup, index)
@@ -472,17 +517,50 @@ function gg.loseDef(def, command)
 end
 
 
+function gg.onExit()
+    send("incall")
+    table.save(getMudletHomeDir() .."/adb.lua", gg.adb or {})
+    table.save(getMudletHomeDir() .."/keepDefs.lua", gg.self.keepup or {})
+end
+
+
 function gg.onPrompt()
+    if not gg.ready then return end
+    gg.lastReaction = gg.lastReaction or getEpoch()
+    if math.abs(getEpoch() - gg.lastReaction) < 0.75 then return end
+    gg.defKeepupCooldowns = gg.defKeepupCooldowns or {}
     for _, def in ipairs(gg.self.keepup) do
         local defIsUp = false
         for _, currentDef in ipairs(gg.self.buffs) do
+            local timeSinceLastDefup = math.abs(getEpoch() - (gg.defKeepupCooldowns[currentDef.name] or getEpoch()))
+            local defIsOnCooldown = timeSinceLastDefup > gg.defKeepupInterval
             if currentDef.name == def.name then
                 defIsUp = true
+                gg.defKeepupCooldowns[currentDef.name] = getEpoch()
                 break
             end
         end
-        if not defIsUp then send(def.command) end
+        if not defIsUp and not defIsOnCooldown and gg.self.has_balance() and gg.self.has_equilibrium() then send(def.command) end
     end
+end
+
+
+function gg.playerNote(playerName, playerInfo)
+    if table.is_empty(playerInfo or {}) then return end
+    playerName = tostring(playerName):title()
+    local playerEntry = gg.adb[playerName] or {}
+    for _, possible_key in ipairs({"city", "guild", "order",
+                                   "city_enemy", "guild_enemy", "order_enemy",
+                                   "personal_enemy", "personal_ally", "notes"}) do
+        if playerInfo[possible_key] then
+            local value = playerInfo[possible_key]
+            if possible_key == "city" then value = value:title() end
+            playerEntry[possible_key] = value
+        end
+    end
+    gg.adb[playerName] = playerEntry
+    gg.event("PlayerUpdate", playerName, "gold", playerEntry)
+    gg.updateADBTriggers()
 end
 
 
@@ -516,9 +594,21 @@ end
 
 function gg.processDefs()
     local Defences = gmcp.Char.Defences
-    local defs = table.deepcopy(Defences.List)
+    local defs = table.deepcopy(gg.self.buffs)
 
-    local needToAdd = true
+    local needToAdd
+    for _, defInfo in ipairs(Defences.List) do
+        needToAdd = true
+        for index, def in ipairs(defs) do
+            if defInfo.name == def.name then
+                needToAdd = false
+                break
+            end
+        end
+        if needToAdd then defs[#defs + 1] = defInfo end
+    end
+
+    needToAdd = true
     if Defences.Add then
         for index, def in ipairs(defs) do
             if Defences.Add.name == def.name then
@@ -539,6 +629,14 @@ function gg.processDefs()
     end
 
     gg.self.buffs = defs
+end
+
+
+function gg.processExtraDef(name, desc)
+    for _, def in ipairs(gg.self.buffs) do
+        if name == def.name then return end
+    end
+    gg.self.buffs[#gg.self.buffs + 1] = {name=name, desc=desc}
 end
 
 
@@ -596,7 +694,7 @@ function gg.processNearbyAdventurers()
     local Room = gmcp.Room
     local players = {}
 
-    for _, player in ipairs(Room.Players) do
+    for _, player in ipairs(Room.Players or {}) do
         players[#players + 1] = player.name
     end
 
@@ -762,3 +860,51 @@ deleteNamedEventHandler("gg.init", "sysConnectionEvent")
 registerNamedEventHandler("gg.init", "sysConnectionEvent", "sysConnectionEvent", function()
     tempTimer(2, gg.init) end)
 
+
+function gg.updateADBTriggers()
+    for _, adbInfo in ipairs(gg.adb or {}) do
+        if not adbInfo.has_trigger then
+            tempTrigger(adb.name, function()
+                selectString(adb.name)
+                if adbInfo.city and gg.ui.whoColors[adbInfo.city:title()] then
+                    fg(gg.ui.whoColors[adbInfo.city:title()])
+                end
+                if adbInfo.city_enemy then setItalics() end
+                if adbInfo.enemy then setBold() end
+            end)
+            adbInfo.has_trigger = true
+        end
+    end
+end
+
+
+function gg.usedBalance(balType, timeToReturn)
+    timeToReturn = tonumber(timeToReturn)
+
+    local badgeLookup = {
+        Balance={name="balBadge", label="BAL"},
+        Equilibrium={name="eqBadge", label="EQ"},
+        Elixir={name="sipBadge", label="SIP"},
+    }
+
+    if table.contains(badgeLookup, balType) then
+        local badgeInfo = badgeLookup[balType]
+        local uiWidget = gg.ui[badgeInfo.name]
+        if not uiWidget then error("ui widget for ".. balType .."(".. badgeInfo.name ..") not found") end
+        uiWidget:cecho("<center><".. gg.ui.offColor ..">".. badgeInfo.label .."</center>")
+        if timeToReturn then
+            tempTimer(timeToReturn - 3.05, function()
+                uiWidget:cecho("<center><".. gg.ui.threeSecWarnColor ..">".. badgeInfo.label .."</center>")
+            end)
+            tempTimer(timeToReturn - 2.05, function()
+                uiWidget:cecho("<center><".. gg.ui.twoSecWarnColor ..">".. badgeInfo.label .."</center>")
+            end)
+            tempTimer(timeToReturn - 1.05, function()
+                uiWidget:cecho("<center><".. gg.ui.oneSecWarnColor ..">".. badgeInfo.label .."</center>")
+            end)
+            tempTimer(timeToReturn - 0.05, function()
+                uiWidget:cecho("<center><".. gg.ui.availColor ..">".. badgeInfo.label .."</center>")
+            end)
+        end
+    end
+end
